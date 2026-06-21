@@ -13,6 +13,7 @@ sys.path.append('.')
 
 # Try importing from your recommendation engine and digital twin modules
 try:
+    import recommendation_engine
     from recommendation_engine import process_single_incident, run_integrated_traffic_pipeline
     from digital_twin import (load_bengaluru_graph_with_priors, load_empirical_traffic_priors,
                                compute_dynamic_network_states, compare_scenarios,
@@ -71,6 +72,21 @@ if 'incident_list' not in st.session_state:
 if 'result_table' not in st.session_state:
     st.session_state['result_table'] = None
 
+if 'STATION_SUPPLY_POOLS' not in st.session_state:
+    st.session_state['STATION_SUPPLY_POOLS'] = {
+        'peenya': {'cops': 15, 'barricades': 20},
+        'hsr layout': {'cops': 20, 'barricades': 25},
+        'wilson garden': {'cops': 12, 'barricades': 15},
+        'sadashivanagar': {'cops': 10, 'barricades': 12},
+        'cubbon park': {'cops': 25, 'barricades': 30},
+        'kengeri': {'cops': 12, 'barricades': 15},
+        'hebbala': {'cops': 18, 'barricades': 22},
+        'unknown': {'cops': 8, 'barricades': 10}
+    }
+
+# Sync session state pools back into recommendation engine globals
+recommendation_engine.STATION_SUPPLY_POOLS = st.session_state['STATION_SUPPLY_POOLS']
+
 # ==========================================
 # SIDEBAR MULTI-PAGE NAVIGATION PANEL
 # ==========================================
@@ -82,7 +98,8 @@ pages = st.sidebar.radio("Navigation Systems", [
     "📊 Batch Optimizer", 
     "🗺️ Route Optimizer",
     "📈 EDA Dashboard",
-    "🗺️ Incident Map"
+    "🗺️ Incident Map",
+    "⚙️ Station Config"
 ])
 
 st.sidebar.markdown("---")
@@ -513,24 +530,24 @@ elif pages == "📈 EDA Dashboard":
     
     with tab1:
         st.subheader("Temporal Congestion Density Trends Across Hour Horizons")
-        if os.path.exists("charts/visual_b_cause_hour_matrix.png"):
-            st.image("charts/visual_b_cause_hour_matrix.png", use_container_width=True)
+        if os.path.exists("charts/visual_b_incident_hourly_patterns.png"):
+            st.image("charts/visual_b_incident_hourly_patterns.png", use_container_width=True)
         else:
             st.info("📊 Placeholder: [Heatmap Matrix Plot showing Event Causes across Hourly Spans]")
         st.markdown("> **Core Data Insight:** Vehicle breakdowns peak consistently between **5-7 AM** and **5-8 PM** on Outer Ring Road arterial routes, matching logistics carrier operation window switches before cross-city entry blocks lock down.")
         
     with tab2:
         st.subheader("Regional Police Station Cluster Efficiency Coordinates")
-        if os.path.exists("charts/chart_21_station_quadrant.png"):
-            st.image("charts/chart_21_station_quadrant.png", use_container_width=True)
+        if os.path.exists("charts/chart_21_resource_pressure_matrix.png"):
+            st.image("charts/chart_21_resource_pressure_matrix.png", use_container_width=True)
         else:
             st.info("📊 Placeholder: [Scatter Quadrant Mapping Police Stations by Incident Volumes and Response Delays]")
         st.markdown("> **Core Data Insight:** The HSR Layout and Peenya sectors sit deep inside the high-volume, prolonged-resolution quadrant, indicating these nodes require expanded structural resource baselines.")
         
     with tab3:
         st.subheader("Top Critical Intersections Ranked By High Impact Likelihoods")
-        if os.path.exists("charts/visual_g_junction_impact_ranking.png"):
-            st.image("charts/visual_g_junction_impact_ranking.png", use_container_width=True)
+        if os.path.exists("charts/visual_g_top_impacted_junctions.png"):
+            st.image("charts/visual_g_top_impacted_junctions.png", use_container_width=True)
         else:
             st.info("📊 Placeholder: [Horizontal Bar Graph isolating top 15 Junction targets sorted by High Impact Risk ratios]")
         st.markdown("> **Core Data Insight:** Agara Junction and Central Silk Board track with an average historical clearing window exceeding **140 minutes** when heavy fleet carriers breakdown during peak morning windows.")
@@ -582,3 +599,71 @@ elif pages == "🗺️ Incident Map":
             
             folium_static(m, width=1100, height=600)
             st.caption("Visual Map Grid Scale: High density clusters (Red areas) highlight historical multi-incident overlap hotspots.")
+
+# ==========================================
+# PAGE 6: STATION RESOURCE CONTROL PANEL (ADMIN)
+# ==========================================
+elif pages == "⚙️ Station Config":
+    st.title("⚙️ Station Resource Configuration Control Panel")
+    st.markdown("##### Manage and distribute static station resource limits dynamically across police jurisdictions")
+    st.markdown("---")
+    
+    st.warning("⚠️ **Administrative Authorization Override:** Modifying these resource pools will instantly mutate the mathematical capacity constraints inside the PuLP linear programming knapsack optimizer.")
+    
+    st.write("### 🏢 Current Station Capacity Allocation Matrix")
+    
+    cols = st.columns(2)
+    pools = st.session_state['STATION_SUPPLY_POOLS']
+    
+    updated_pools = {}
+    
+    stations = sorted(list(pools.keys()))
+    if 'unknown' in stations:
+        stations.remove('unknown')
+        stations.append('unknown')
+        
+    for i, station in enumerate(stations):
+        col_idx = i % 2
+        with cols[col_idx]:
+            st.markdown(f"#### 🚔 {station.title()}")
+            c_input, b_input = st.columns(2)
+            cops_val = c_input.number_input(
+                "Cops Capacity", 
+                min_value=0, 
+                max_value=100, 
+                value=int(pools[station]['cops']),
+                key=f"{station}_cops"
+            )
+            barricades_val = b_input.number_input(
+                "Barricades Capacity", 
+                min_value=0, 
+                max_value=100, 
+                value=int(pools[station]['barricades']),
+                key=f"{station}_barricades"
+            )
+            updated_pools[station] = {'cops': cops_val, 'barricades': barricades_val}
+            st.markdown("---")
+            
+    col_save, col_reset = st.columns([1, 1])
+    
+    if col_save.button("💾 Apply Configuration & Save Matrix", use_container_width=True):
+        st.session_state['STATION_SUPPLY_POOLS'] = updated_pools
+        recommendation_engine.STATION_SUPPLY_POOLS = updated_pools
+        st.success("✅ **Configuration applied!** Station resource pools updated successfully in live memory.")
+        st.toast("Active resources updated!")
+        
+    if col_reset.button("🗑️ Reset to Standard BTP Defaults", use_container_width=True):
+        defaults = {
+            'peenya': {'cops': 15, 'barricades': 20},
+            'hsr layout': {'cops': 20, 'barricades': 25},
+            'wilson garden': {'cops': 12, 'barricades': 15},
+            'sadashivanagar': {'cops': 10, 'barricades': 12},
+            'cubbon park': {'cops': 25, 'barricades': 30},
+            'kengeri': {'cops': 12, 'barricades': 15},
+            'hebbala': {'cops': 18, 'barricades': 22},
+            'unknown': {'cops': 8, 'barricades': 10}
+        }
+        st.session_state['STATION_SUPPLY_POOLS'] = defaults
+        recommendation_engine.STATION_SUPPLY_POOLS = defaults
+        st.success("♻️ Defaults restored. Save to apply.")
+        st.rerun()
