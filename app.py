@@ -511,6 +511,8 @@ elif pages == "🗺️ Route Optimizer":
             st.dataframe(comparison_df, use_container_width=True)
             
             st.markdown("### 🗺️ Dynamic Incident Command View")
+            inc_lat = inc.get('latitude') if inc is not None else None
+            inc_lon = inc.get('longitude') if inc is not None else None
             route_map = visualize_routes_on_map(
                 G_dynamic, path_dijkstra, path_astar,
                 orig_lat, orig_lon, dest_lat, dest_lon,
