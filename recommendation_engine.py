@@ -29,7 +29,7 @@ STATION_SUPPLY_POOLS = {
 }
 
 # Load artifacts strictly ONCE out of runtime execution loops
-PIPELINE_PATH = 'traffic_impact_production_pipeline.pkl'
+PIPELINE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'traffic_impact_production_pipeline.pkl')
 if os.path.exists(PIPELINE_PATH):
     print("Loading Global Production Artifacts into Memory...")
     GLOBAL_ARTIFACTS = joblib.load(PIPELINE_PATH)

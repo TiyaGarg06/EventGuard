@@ -14,6 +14,9 @@ def load_bengaluru_graph_with_priors(address="MG Road, Bengaluru, Karnataka, Ind
     Downloads and projects the network map graph using metric systems (UTM) for exact logic.
     Saves it locally to ensure the system is independent of internet connectivity during presentations.
     """
+    if not os.path.isabs(cache_filename):
+        cache_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), cache_filename)
+
     if os.path.exists(cache_filename):
         print(f"[OSM Engine] Loading pre-saved physical graph local file: {cache_filename}")
         return ox.load_graphml(cache_filename)
@@ -48,6 +51,9 @@ def load_empirical_traffic_priors(csv_path="road_network_priors.csv"):
     Ingests observed speed feeds and probe GPS baseline metrics.
     Maps parameters to a high-speed matrix hash index for real-time edge processing.
     """
+    if not os.path.isabs(csv_path):
+        csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), csv_path)
+
     if not os.path.exists(csv_path):
         print(f"[Warning] Priors dataset file missing at: '{csv_path}'. Initializing empty priors matrix.")
         return {}, 35.0, []
