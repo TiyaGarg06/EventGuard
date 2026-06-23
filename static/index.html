@@ -33,7 +33,9 @@
         </div>
         <nav class="hud-tabs">
             <button class="tab-btn active" data-tab="triage">Triage Predictor</button>
+            <button class="tab-btn" data-tab="batch">Batch Optimizer</button>
             <button class="tab-btn" data-tab="routing">Route Optimizer</button>
+            <button class="tab-btn" data-tab="eda">EDA Insights</button>
             <button class="tab-btn" data-tab="config">Station Config</button>
         </nav>
     </header>
@@ -194,6 +196,89 @@
                 <button type="button" id="btn-reset-config" class="btn-secondary">Restore Defaults</button>
             </div>
         </section>
+
+        <!-- Tab 4: Batch Optimizer Panel -->
+        <section id="panel-batch" class="panel-section">
+            <h2>Batch Cluster Optimizer</h2>
+            <div class="instructions">Upload incident logs CSV sequence documents to run PuLP capacity pool optimizations.</div>
+            
+            <div class="file-upload-zone" id="file-dropzone">
+                <span class="upload-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                </span>
+                <span class="upload-label">Drag & Drop CSV file here or click to browse</span>
+                <input type="file" id="batch-file-input" accept=".csv" style="display: none;">
+            </div>
+            
+            <div id="batch-file-details" class="file-details" style="display: none;">
+                <div class="detail-row">
+                    <span class="label">File Name</span>
+                    <span id="txt-file-name" class="detail-val"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">File Size</span>
+                    <span id="txt-file-size" class="detail-val"></span>
+                </div>
+            </div>
+            
+            <div class="button-group" style="margin-top: 15px;">
+                <button type="button" id="btn-run-batch" class="btn-primary" disabled>Run Batch Solver</button>
+            </div>
+        </section>
+
+        <!-- Tab 5: EDA Insights Panel -->
+        <section id="panel-eda" class="panel-section">
+            <h2>Traffic Insights & Analytics</h2>
+            <div class="instructions">Mined historical bottleneck registries, response clearance windows, and operational resource pressure matrices.</div>
+            
+            <div class="charts-feed">
+                <div class="eda-chart-card">
+                    <h4>Hourly Operations Pulse</h4>
+                    <p>Congestion peaks during morning (08:00 - 11:00) and evening (17:00 - 20:00) commuting shockwaves.</p>
+                    <img src="/charts/visual_b_incident_hourly_patterns.png" alt="Hourly Operations Pulse">
+                </div>
+                <div class="eda-chart-card">
+                    <h4>Chronological Profile Heatmap</h4>
+                    <p>Friction matrix showing localized density by weekday and hours.</p>
+                    <img src="/charts/chart_7_temporal_heatmap.png" alt="Chronological Profile Heatmap">
+                </div>
+                <div class="eda-chart-card">
+                    <h4>Top 10 High-Incident Traffic Corridors</h4>
+                    <p>Arterial roadways accumulating the highest incident counts.</p>
+                    <img src="/charts/chart_13_top_corridors.png" alt="Top Corridors">
+                </div>
+                <div class="eda-chart-card">
+                    <h4>Breakdown Response: Corridor vs Vehicle</h4>
+                    <p>Average clearance durations across transit corridor segments and vehicle classes.</p>
+                    <img src="/charts/chart_22_breakdown_heatmap.png" alt="Breakdown Response Matrix">
+                </div>
+                <div class="eda-chart-card">
+                    <h4>Top 15 Intersections by Traffic Stress</h4>
+                    <p>Junctions displaying extreme delay clearance durations.</p>
+                    <img src="/charts/visual_g_top_impacted_junctions.png" alt="Junction Hotspots">
+                </div>
+                <div class="eda-chart-card">
+                    <h4>Closure Rates vs Clearance Blueprints</h4>
+                    <p>Correlation metrics of road closure requirements against duration thresholds.</p>
+                    <img src="/charts/chart_24_lookup_blueprint.png" alt="Closure Rates vs Duration">
+                </div>
+                <div class="eda-chart-card">
+                    <h4>Strategic Deployment Matrix</h4>
+                    <p>Incident category and priority correlation limits.</p>
+                    <img src="/charts/chart_25_priority_action_matrix.png" alt="Strategic Deployment Matrix">
+                </div>
+                <div class="eda-chart-card">
+                    <h4>Lifecycle Status Footprint</h4>
+                    <p>Proportion of logged incidents satisfying active response trackers.</p>
+                    <img src="/charts/chart_4_status_donut.png" alt="Status Donut">
+                </div>
+                <div class="eda-chart-card">
+                    <h4>Road Closure Requirements by Cause</h4>
+                    <p>Categorical breakdown of incidents causing complete road blockages.</p>
+                    <img src="/charts/chart_5_road_closure_by_cause.png" alt="Road Closure by Cause">
+                </div>
+            </div>
+        </section>
         
     </aside>
 
@@ -275,6 +360,21 @@
             <div class="empty-state">Submit queue and execute Knapsack Solver to show optimized station resource deployment tables.</div>
         </div>
     </footer>
+
+    <!-- 6. Floating Map Controls (Top Right) -->
+    <aside class="hud-card layer-hud">
+        <div class="panel-header" style="margin-bottom: 5px;">
+            <h3 style="font-size: 0.72rem; letter-spacing: 0.5px;">Map Overlays</h3>
+        </div>
+        <div class="layer-control-row" style="display: flex; align-items: center;">
+            <input type="checkbox" id="layer-heatmap" checked style="width: auto; margin-right: 5px;">
+            <label for="layer-heatmap" style="margin: 0; cursor: pointer; font-size: 0.72rem; font-weight: 500;">Historical Heatmap</label>
+        </div>
+        <div class="layer-control-row" style="display: flex; align-items: center; margin-top: 5px;">
+            <input type="checkbox" id="layer-routes" checked style="width: auto; margin-right: 5px;">
+            <label for="layer-routes" style="margin: 0; cursor: pointer; font-size: 0.72rem; font-weight: 500;">Route Graph Paths</label>
+        </div>
+    </aside>
 
     <!-- Leaflet.js Javascript -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>

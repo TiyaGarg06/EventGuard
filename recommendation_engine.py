@@ -224,7 +224,7 @@ def optimize_station_resource_pool(incidents_dispatches, station_name):
     
     if total_cops_demanded <= available_cops and total_barricades_demanded <= available_barricades:
         for inc in incidents_dispatches: 
-            inc.update({'allocation_fraction': 1.0, 'status': "✅ Managed"})
+            inc.update({'allocation_fraction': 1.0, 'status': "Managed"})
         return incidents_dispatches
 
     prob = LpProblem("Station_Resource_Knapsack", LpMaximize)
@@ -253,7 +253,7 @@ def optimize_station_resource_pool(incidents_dispatches, station_name):
             'cops_needed': int(np.floor(inc['orig_cops'] * fraction)),
             'barricades_needed': int(np.floor(inc['orig_barricades'] * fraction)),
             'diversion_signs': int(np.floor(inc['orig_signs'] * fraction)),
-            'status': "✅ Managed" if fraction >= 0.95 else "⚠️ Under-res"
+            'status': "Managed" if fraction >= 0.95 else "Under-res"
         })
     return incidents_dispatches
 
@@ -275,7 +275,7 @@ def run_integrated_traffic_pipeline(active_incidents_df, historical_df=pd.DataFr
                 rec['orig_cops'] = rec['cops_needed']
                 rec['orig_barricades'] = rec['barricades_needed']
                 rec['allocation_fraction'] = 1.0
-                rec['status'] = "✅ Managed"
+                rec['status'] = "Managed"
             final_allocated_list.extend(group_records)
             
     report_df = pd.DataFrame(final_allocated_list)

@@ -226,5 +226,40 @@ def calculate_routes():
         traceback.print_exc()
         return jsonify({"error": str(e)}), 400
 
+@app.route('/charts/<path:filename>')
+def serve_charts(filename):
+    return send_from_directory(os.path.join(BASE_DIR, 'charts'), filename)
+
+@app.route('/api/optimize_batch', methods=['POST'])
+def optimize_batch_csv():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "Empty filename"}), 400
+    try:
+        batch_df = pd.read_csv(file)
+        result_table = run_integrated_traffic_pipeline(batch_df, historical_df)
+        
+        # Format results without emojis in labels
+        records = result_table.to_dict('records')
+        formatted = []
+        for r in records:
+            status_clean = r['Status'].replace('✅ ', '').replace('⚠️ ', '')
+            formatted.append({
+                'id': r['Incident'],
+                'impact': r['Impact'],
+                'demanded_cops': int(r['Demanded Cops']),
+                'allocated_cops': int(r['Allocated Cops']),
+                'demanded_barricades': int(r['Demanded Barricades']),
+                'allocated_barricades': int(r['Allocated Barricades']),
+                'signs': int(r['Signs']),
+                'status': status_clean
+            })
+        return jsonify(formatted)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
 if __name__ == '__main__':
+
     app.run(host='0.0.0.0', port=5000, debug=True)

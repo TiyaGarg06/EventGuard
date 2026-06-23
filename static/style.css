@@ -642,3 +642,113 @@ td {
     background-color: var(--bg-glass) !important;
     color: var(--text-dark) !important;
 }
+
+/* File Upload Zone styling */
+.file-upload-zone {
+    border: 2px dashed var(--border-clean);
+    background: #FFFFFF;
+    padding: 30px 15px;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: border-color 0.15s ease-in-out;
+    margin-bottom: 15px;
+}
+
+.file-upload-zone:hover {
+    border-color: var(--text-dark);
+}
+
+.upload-icon {
+    font-size: 1.5rem;
+}
+
+.upload-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+.file-details {
+    background: #F9FAFB;
+    border: 1px solid var(--border-clean);
+    padding: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.detail-row .label {
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-muted);
+}
+
+.detail-val {
+    font-weight: 500;
+}
+
+/* EDA Scrollable Feed */
+.charts-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.eda-chart-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border-clean);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.eda-chart-card h4 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px dashed var(--border-clean);
+    padding-bottom: 4px;
+}
+
+.eda-chart-card p {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+.eda-chart-card img {
+    width: 100%;
+    height: auto;
+    border: 1px solid #F3F4F6;
+}
+
+/* Layer Control floating pane (Top Right) */
+.layer-hud {
+    top: 95px;
+    right: 15px;
+    width: 190px;
+    padding: 10px 15px;
+    gap: 8px;
+}
+
+.layer-control-row {
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+}
+

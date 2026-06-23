@@ -85,7 +85,7 @@ def load_empirical_traffic_priors(csv_path="road_network_priors.csv"):
     print(f"[Traffic Nature Engine] Mined {len(prior_traffic_matrix)} segment profiles directly from historical velocity logs.")
     return prior_traffic_matrix, global_median_speed, junctions_registry
 
-# ✅ SCOPE RESOLUTION FIX: Expose identical aliases to align with frontend cache hooks
+# SCOPE RESOLUTION FIX: Expose identical aliases to align with frontend cache hooks
 mine_historical_traffic_priors = load_empirical_traffic_priors
 
 # ==============================================================================

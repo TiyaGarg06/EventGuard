@@ -41,6 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initForms();
     initRoutePicker();
     initStationControls();
+    initBatchUploader();
+    initLayerToggles();
 });
 
 // Tab Transitions Setup
@@ -633,3 +635,112 @@ function renderStationConfig() {
         container.appendChild(row);
     });
 }
+
+// Batch CSV Uploader & Solver Logic
+function initBatchUploader() {
+    const dropzone = document.getElementById('file-dropzone');
+    const fileInput = document.getElementById('batch-file-input');
+    const btnRunBatch = document.getElementById('btn-run-batch');
+    const detailsDiv = document.getElementById('batch-file-details');
+    const txtName = document.getElementById('txt-file-name');
+    const txtSize = document.getElementById('txt-file-size');
+    
+    let selectedFile = null;
+    
+    dropzone.addEventListener('click', () => fileInput.click());
+    
+    dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.style.borderColor = 'var(--primary-blue)';
+    });
+    
+    dropzone.addEventListener('dragleave', () => {
+        dropzone.style.borderColor = 'var(--border-clean)';
+    });
+    
+    dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.style.borderColor = 'var(--border-clean)';
+        if (e.dataTransfer.files.length > 0) {
+            handleFileSelect(e.dataTransfer.files[0]);
+        }
+    });
+    
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            handleFileSelect(fileInput.files[0]);
+        }
+    });
+    
+    function handleFileSelect(file) {
+        if (!file.name.endsWith('.csv')) {
+            alert("Please upload CSV files only.");
+            return;
+        }
+        selectedFile = file;
+        txtName.textContent = file.name;
+        txtSize.textContent = `${(file.size / 1024).toFixed(1)} KB`;
+        detailsDiv.style.display = 'flex';
+        btnRunBatch.disabled = false;
+    }
+    
+    btnRunBatch.addEventListener('click', async () => {
+        if (!selectedFile) return;
+        
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        
+        btnRunBatch.textContent = 'Processing...';
+        btnRunBatch.disabled = true;
+        
+        try {
+            const response = await fetch('/api/optimize_batch', {
+                method: 'POST',
+                body: formData
+            });
+            const results = await response.json();
+            
+            if (results.error) {
+                alert(results.error);
+                return;
+            }
+            
+            renderAllocations(results);
+            alert("Batch knapsack optimizations calculated successfully.");
+        } catch (err) {
+            console.error("Batch optimization failed: ", err);
+            alert("Failed to process batch CSV file.");
+        } finally {
+            btnRunBatch.textContent = 'Run Batch Solver';
+            btnRunBatch.disabled = false;
+        }
+    });
+}
+
+// Layer Overlay Checkboxes Logic
+function initLayerToggles() {
+    const heatCheckbox = document.getElementById('layer-heatmap');
+    const routesCheckbox = document.getElementById('layer-routes');
+    
+    heatCheckbox.addEventListener('change', () => {
+        if (heatCheckbox.checked) {
+            if (heatmapLayer) heatmapLayer.addTo(map);
+        } else {
+            if (heatmapLayer) map.removeLayer(heatmapLayer);
+        }
+    });
+    
+    routesCheckbox.addEventListener('change', () => {
+        const layers = [activeRouteLayers.dijkstra, activeRouteLayers.astar, activeRouteLayers.incidentDecay];
+        layers.forEach(layer => {
+            if (layer) {
+                if (routesCheckbox.checked) {
+                    layer.addTo(map);
+                } else {
+                    map.removeLayer(layer);
+                }
+            }
+        });
+    });
+}
+

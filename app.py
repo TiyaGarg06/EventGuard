@@ -26,7 +26,7 @@ try:
                                compute_dynamic_network_states, compare_scenarios,
                                visualize_routes_on_map)
 except ImportError as e:
-    st.error(f"❌ Failed to bind to backend scripts: {str(e)}. Ensure all files reside in the same execution folder.")
+    st.error(f"Failed to bind to backend scripts: {str(e)}. Ensure all files reside in the same execution folder.")
     st.stop()
 
 # ==========================================
@@ -34,7 +34,7 @@ except ImportError as e:
 # ==========================================
 st.set_page_config(
     page_title="EventGuard - BTP Traffic Intelligence",
-    page_icon="🚦",
+    page_icon=None,
     layout="wide",
     menu_items={
         'Get Help': 'https://github.com/tanishka4481/Gridlock',
@@ -51,7 +51,7 @@ def load_historical_reference(path="theme2.csv"):
     post-event tracking loops, and historical geolocation rendering speeds.
     """
     if not os.path.exists(path):
-        st.error(f"❌ Historical reference context dataset missing at file path location: {path}")
+        st.error(f"Historical reference context dataset missing at file path location: {path}")
         return pd.DataFrame()
     
     dtype_dict = {
@@ -97,16 +97,16 @@ recommendation_engine.STATION_SUPPLY_POOLS = st.session_state['STATION_SUPPLY_PO
 # ==========================================
 # SIDEBAR MULTI-PAGE NAVIGATION PANEL
 # ==========================================
-st.sidebar.title("👮 BTP Command Control")
+st.sidebar.title("BTP Command Control")
 st.sidebar.markdown("---")
 
 pages = st.sidebar.radio("Navigation Systems", [
-    "🔍 Live Predictor",
-    "📊 Batch Optimizer", 
-    "🗺️ Route Optimizer",
-    "📈 EDA Dashboard",
-    "🗺️ Incident Map",
-    "⚙️ Station Config"
+    "Live Predictor",
+    "Batch Optimizer", 
+    "Route Optimizer",
+    "EDA Dashboard",
+    "Incident Map",
+    "Station Config"
 ])
 
 st.sidebar.markdown("---")
@@ -116,8 +116,8 @@ st.sidebar.caption("EventGuard v2.7.5 • Real-Time Congestion Triage Engine")
 # ==========================================
 # PAGE 1: LIVE INCIDENT PREDICTOR & QUEUE
 # ==========================================
-if pages == "🔍 Live Predictor":
-    st.title("🚦 EventGuard: BTP Resource Allocation System")
+if pages == "Live Predictor":
+    st.title("EventGuard: BTP Resource Allocation System")
     st.markdown("##### Real-Time Predictive Triage Matrix for Event-Driven and Unplanned Congestion Gridlocks")
     st.markdown("---")
     
@@ -127,12 +127,12 @@ if pages == "🔍 Live Predictor":
             return sorted([v for v in vals if v.lower() != 'unknown'])
         return default_list
 
-    st.subheader("📝 Live Incident Input Parameters")
+    st.subheader("Live Incident Input Parameters")
     
     inp_left, inp_right = st.columns([1, 1])
     
     with inp_right:
-        st.markdown("**📍 Click map to set location (Auto-fills Coordinates, Station, Corridor, and Zone)**")
+        st.markdown("**Click map to set location (Auto-fills Coordinates, Station, Corridor, and Zone)**")
         click_map = folium.Map(location=[12.9716, 77.5946], zoom_start=11, tiles="CartoDB positron")
         
         if not historical_df.empty:
@@ -210,12 +210,12 @@ if pages == "🔍 Live Predictor":
 
     col_add, col_run, col_clear = st.columns([1, 1, 1])
     
-    if col_add.button("➕ Add Incident to Queue", use_container_width=True):
+    if col_add.button("Add Incident to Queue", use_container_width=True):
         st.session_state['incident_list'].append(incident_payload.copy())
-        st.success(f"✅ Incident added. Queue size: {len(st.session_state['incident_list'])}")
+        st.success(f"Incident added. Queue size: {len(st.session_state['incident_list'])}")
         st.rerun()
 
-    if col_run.button("🚀 Run Knapsack Optimization on Queue", use_container_width=True):
+    if col_run.button("Run Knapsack Optimization on Queue", use_container_width=True):
         if len(st.session_state['incident_list']) == 0:
             st.warning("Add at least one incident to the queue first.")
         else:
@@ -236,14 +236,14 @@ if pages == "🔍 Live Predictor":
                         'veh_type': first_item['veh_type']
                     }
 
-    if col_clear.button("🗑️ Clear Queue", use_container_width=True):
+    if col_clear.button("Clear Queue", use_container_width=True):
         st.session_state['incident_list'] = []
         st.session_state['result_table'] = None
         st.session_state['last_incident'] = None
         st.rerun()
 
     if len(st.session_state['incident_list']) > 0:
-        st.markdown(f"### 📋 Active Incident Queue ({len(st.session_state['incident_list'])} incidents)")
+        st.markdown(f"### Active Incident Queue ({len(st.session_state['incident_list'])} incidents)")
         queue_display = pd.DataFrame([{
             'Incident ID': inc['id'],
             'Event Cause': inc['event_cause'],
@@ -259,10 +259,10 @@ if pages == "🔍 Live Predictor":
     if st.session_state['result_table'] is not None:
         result = st.session_state['result_table']
         st.markdown("---")
-        st.markdown("### 🏆 Knapsack Allocation Results")
+        st.markdown("### Knapsack Allocation Results")
         
         def highlight_status(column_data):
-            return ['background-color: #ffcccc; color: #990000; font-weight: bold;' if val == '⚠️ Under-res'
+            return ['background-color: #ffcccc; color: #990000; font-weight: bold;' if val == 'Under-res'
                     else 'background-color: #ccffcc; color: #006600; font-weight: bold;' for val in column_data]
         
         st.dataframe(
@@ -272,13 +272,13 @@ if pages == "🔍 Live Predictor":
         
         m1, m2, m3 = st.columns(3)
         m1.metric("Total Incidents", len(result))
-        m2.metric("Fully Managed", len(result[result['Status'] == '✅ Managed']))
-        m3.metric("Under-resourced", len(result[result['Status'] == '⚠️ Under-res']))
+        m2.metric("Fully Managed", len(result[result['Status'] == 'Managed']))
+        m3.metric("Under-resourced", len(result[result['Status'] == 'Under-res']))
         
-        if any(result['Status'] == '⚠️ Under-res'):
-            st.error("⚠️ Station capacity exceeded — backup from adjacent stations required")
+        if any(result['Status'] == 'Under-res'):
+            st.error("Station capacity exceeded — backup from adjacent stations required")
             
-        st.markdown("### 🏢 Per-Station Resource Summary")
+        st.markdown("### Per-Station Resource Summary")
         queue_df_ref = pd.DataFrame(st.session_state['incident_list'])
         queue_df_ref['id'] = [f"Q_{i+1:03d}" for i in range(len(queue_df_ref))]
         
@@ -289,7 +289,7 @@ if pages == "🔍 Live Predictor":
             Incidents=('Incident', 'count'),
             Total_Cops=('Allocated Cops', 'sum'),
             Total_Barricades=('Allocated Barricades', 'sum'),
-            Under_Resourced=('Status', lambda x: (x == '⚠️ Under-res').sum())
+            Under_Resourced=('Status', lambda x: (x == 'Under-res').sum())
         ).reset_index()
         
         st.dataframe(station_summary, use_container_width=True, hide_index=True)
@@ -297,9 +297,9 @@ if pages == "🔍 Live Predictor":
 # ==========================================
 # PAGE 2: BATCH MULTI-INCIDENT OPTIMIZER
 # ==========================================
-elif pages == "📊 Batch Optimizer":
-    st.title("📊 Multi-Incident Station Optimizer Matrix")
-    st.info("💡 Upload active sector cluster incidents CSV files to run PuLP fractional knapsack capacity pool optimizations.")
+elif pages == "Batch Optimizer":
+    st.title("Multi-Incident Station Optimizer Matrix")
+    st.info("Upload active sector cluster incidents CSV files to run PuLP fractional knapsack capacity pool optimizations.")
     st.markdown("---")
     
     uploaded_file = st.file_uploader("Upload Cluster Incidents CSV manifest sequence document", type=["csv"])
@@ -307,19 +307,19 @@ elif pages == "📊 Batch Optimizer":
     if uploaded_file is not None:
         try:
             batch_df = pd.read_csv(uploaded_file)
-            st.markdown("### 📥 Loaded Active Incidents Data Stream Pipeline")
+            st.markdown("### Loaded Active Incidents Data Stream Pipeline")
             st.dataframe(batch_df, use_container_width=True)
             
             st.markdown("---")
             
-            if st.button("🚀 Run Fractional Knapsack Resource Optimization", use_container_width=True):
+            if st.button("Run Fractional Knapsack Resource Optimization", use_container_width=True):
                 with st.spinner("Formulating optimization constraints and compiling linear model matrix parameters..."):
                     result_table = run_integrated_traffic_pipeline(batch_df, historical_df)
                     
-                    st.markdown("### 🏆 Optimized Personnel and Equipment Resource Allocation Table")
+                    st.markdown("### Optimized Personnel and Equipment Resource Allocation Table")
                     
                     def highlight_deficits(column_data):
-                        return ['background-color: #ffcccc; color: #990000; font-weight: bold;' if val == '⚠️ Under-res' 
+                        return ['background-color: #ffcccc; color: #990000; font-weight: bold;' if val == 'Under-res' 
                                 else 'background-color: #ccffcc; color: #006600; font-weight: bold;' for val in column_data]
                     
                     st.dataframe(
@@ -330,24 +330,24 @@ elif pages == "📊 Batch Optimizer":
                     st.markdown("---")
                     sm1, sm2 = st.columns(2)
                     total_incidents = len(result_table)
-                    under_resourced_count = len(result_table[result_table['Status'] == '⚠️ Under-res'])
+                    under_resourced_count = len(result_table[result_table['Status'] == 'Under-res'])
                     
                     sm1.metric("Total Processing Queue Incidents Evaluated", f"{total_incidents} Events")
                     sm2.metric("Manpower Stranded / Under-Resourced Gridlocks", f"{under_resourced_count} Incidents", delta=f"{under_resourced_count} Deficits", delta_color="inverse")
                     
                     if under_resourced_count > 0:
-                        st.warning("⚠️ **CAPACITY WARNING:** CRITICAL RESOURCE DEFICIT IDENTIFIED across local administrative sectors. Automated mutual-aid backup requests have been dispatched to adjacent police station nodes.")
+                        st.warning("**CAPACITY WARNING:** CRITICAL RESOURCE DEFICIT IDENTIFIED across local administrative sectors. Automated mutual-aid backup requests have been dispatched to adjacent police station nodes.")
                     else:
-                        st.success("✅ **STATION STATUS STABLE:** Local supply pools completely satisfied all current operational segment incident demands cleanly.")
+                        st.success("**STATION STATUS STABLE:** Local supply pools completely satisfied all current operational segment incident demands cleanly.")
                         
         except Exception as e:
-            st.error(f"❌ Structural Ingestion Error processing Uploaded CSV Matrix Layout: {str(e)}")
+            st.error(f"Structural Ingestion Error processing Uploaded CSV Matrix Layout: {str(e)}")
 
 # ==========================================
 # PAGE 3: DYNAMIC ROUTE OPTIMIZER (DIGITAL TWIN)
 # ==========================================
-elif pages == "🗺️ Route Optimizer":
-    st.title("🗺️ Dynamic Route Optimizer — Congestion-Aware Pathfinding")
+elif pages == "Route Optimizer":
+    st.title("Dynamic Route Optimizer — Congestion-Aware Pathfinding")
     st.markdown("##### Dijkstra + A* routing combining OpenStreetMap structural travel-time priors with mined historical logs data clusters")
     st.markdown("---")
     
@@ -359,16 +359,16 @@ elif pages == "🗺️ Route Optimizer":
     def compile_empirical_traffic_priors_index(csv_path="road_network_priors.csv"):
         return load_empirical_traffic_priors(get_path(csv_path))
         
-    st.info("💡 **Traffic Engineering Breakthrough:** This engine breaks free from manual formulas and administrative logging parameters. It overlays a 4-month matrix of **observed velocity feeds** and **probe GPS data counts** straight onto the physical network geometries.")
+    st.info("**Traffic Engineering Breakthrough:** This engine breaks free from manual formulas and administrative logging parameters. It overlays a 4-month matrix of **observed velocity feeds** and **probe GPS data counts** straight onto the physical network geometries.")
     
     with st.spinner("Compiling city graph and mining historical velocity feeds..."):
         G_base = get_precompiled_network_map()
         mined_traffic_matrix, fallback_speed, juncs_registry = compile_empirical_traffic_priors_index(get_path("road_network_priors.csv"))
         
-    st.success(f"✅ City Network Map Loaded: {len(G_base.nodes)} intersections and {len(G_base.edges)} road lines fully operational.")
+    st.success(f"City Network Map Loaded: {len(G_base.nodes)} intersections and {len(G_base.edges)} road lines fully operational.")
     
     # Live Telemetry Matrix Display Card
-    st.markdown("### 📊 Empirical Network Velocity Diagnostics")
+    st.markdown("### Empirical Network Velocity Diagnostics")
     total_mined_keys = len(mined_traffic_matrix)
     
     col_stat1, col_stat2, col_stat3 = st.columns(3)
@@ -381,15 +381,15 @@ elif pages == "🗺️ Route Optimizer":
     # --------------------------------------------------------------------------
     # LINKAGE CONNECTION STEP: LIVE INCIDENT HOTLINK QUEUE PICKER
     # --------------------------------------------------------------------------
-    st.markdown("### 🔗 Step 1: Live Command Center Hot-Linkage")
+    st.markdown("### Step 1: Live Command Center Hot-Linkage")
     active_queue = st.session_state.get('incident_list', [])
     
     link_lat, link_lon, link_station = None, None, None
     
     if len(active_queue) == 0:
-        st.info("ℹ️ Mini Command Center Queue Empty: Add active incidents under '🔍 Live Predictor' to lock down emergency dispatch tracks instantly.")
+        st.info("Mini Command Center Queue Empty: Add active incidents under 'Live Predictor' to lock down emergency dispatch tracks instantly.")
     else:
-        st.success(f"🔔 **Active Incidents Mapped:** Found {len(active_queue)} active dispatch items available in the shared memory cache layer.")
+        st.success(f"Active Incidents Mapped: Found {len(active_queue)} active dispatch items available in the shared memory cache layer.")
         
         queue_options = ["None — Manual Simulation Mode"] + [
             f"[{inc['id']}] {inc['event_cause'].title()} at {inc['junction']} ({inc['police_station'].title()} Pool)" 
@@ -397,7 +397,7 @@ elif pages == "🗺️ Route Optimizer":
         ]
         
         selected_link = st.selectbox(
-            "🎯 Select an ongoing incident to route emergency dispatches automatically:",
+            "Select an ongoing incident to route emergency dispatches automatically:",
             options=queue_options,
             index=0
         )
@@ -410,10 +410,10 @@ elif pages == "🗺️ Route Optimizer":
             link_lon = float(linked_incident['longitude'])
             link_station = str(linked_incident['police_station']).strip().title()
             
-            st.warning(f"⚡ **Hotlink Override Active:** System has locked routing endpoints. Origin snapped to the incident epicenter. Destination snapped to **{link_station} Police Station**.")
+            st.warning(f"Hotlink Override Active: System has locked routing endpoints. Origin snapped to the incident epicenter. Destination snapped to **{link_station} Police Station**.")
 
     st.markdown("---")
-    st.markdown("### 🛠️ Step 2: Set Live Environment State Controls")
+    st.markdown("### Step 2: Set Live Environment State Controls")
     
     col_t1, col_t2 = st.columns(2)
     with col_t1:
@@ -427,9 +427,9 @@ elif pages == "🗺️ Route Optimizer":
     active_inc_df = pd.DataFrame([inc]) if inc is not None else None
     
     if inc:
-        st.warning(f"🚨 **ACTIVE SHOCKWAVE MUTATOR:** Incident active at intersection '{inc.get('junction', 'Coordinates Intersection')}.' Mined road priors have been loaded, and a live spatial decay multiplier is active.")
+        st.warning(f"**ACTIVE SHOCKWAVE MUTATOR:** Incident active at intersection '{inc.get('junction', 'Coordinates Intersection')}.' Mined road priors have been loaded, and a live spatial decay multiplier is active.")
     else:
-        st.info("ℹ️ No active live bottlenecks in queue. Network graph running standard background temporal speed priors + mined historical road friction.")
+        st.info("No active live bottlenecks in queue. Network graph running standard background temporal speed priors + mined historical road friction.")
         
     with st.spinner("Computing dynamic network states across time profiles..."):
         G_dynamic = compute_dynamic_network_states(
@@ -443,7 +443,7 @@ elif pages == "🗺️ Route Optimizer":
         )
         
     st.markdown("---")
-    st.markdown("### 📍 Step 3: Route Coordinate Profiles Selection")
+    st.markdown("### Step 3: Route Coordinate Profiles Selection")
     
     if link_lat is not None and link_lon is not None and link_station is not None:
         station_node_lookup = {
@@ -456,20 +456,20 @@ elif pages == "🗺️ Route Optimizer":
         orig_lat, orig_lon = link_lat, link_lon
         dest_lat, dest_lon = dest_station_coords[0], dest_station_coords[1]
         
-        st.info(f"📍 **Locked Dispatches Coordinates:** [Origin: {orig_lat:.5f}, {orig_lon:.5f}] ➔ [Destination Station: {dest_lat:.5f}, {dest_lon:.5f}]")
+        st.info(f"**Locked Dispatches Coordinates:** [Origin: {orig_lat:.5f}, {orig_lon:.5f}] -> [Destination Station: {dest_lat:.5f}, {dest_lon:.5f}]")
     else:
-        picker_mode = st.radio("Coordinate Configuration Input Selection Mode:", ["🗺️ Interactive Map Selector", "⌨️ Manual Coordinate Entry"], horizontal=True)
+        picker_mode = st.radio("Coordinate Configuration Input Selection Mode:", ["Interactive Map Selector", "Manual Coordinate Entry"], horizontal=True)
         
         if 'pick_stage' not in st.session_state: st.session_state['pick_stage'] = 'origin'
         if 'route_orig' not in st.session_state: st.session_state['route_orig'] = (12.9716, 77.5946)
         if 'route_dest' not in st.session_state: st.session_state['route_dest'] = (12.9352, 77.6245)
         
-        if picker_mode == "🗺️ Interactive Map Selector":
-            st.markdown(f"👉 **Active Picking Target: Mapped Route `{st.session_state['pick_stage'].upper()}` Point**")
+        if picker_mode == "Interactive Map Selector":
+            st.markdown(f"**Active Picking Target: Mapped Route `{st.session_state['pick_stage'].upper()}` Point**")
             col_btn1, col_btn2 = st.columns(2)
-            if col_btn1.button("📌 Set Next Click as Origin Target", use_container_width=True):
+            if col_btn1.button("Set Next Click as Origin Target", use_container_width=True):
                 st.session_state['pick_stage'] = 'origin'
-            if col_btn2.button("🏁 Set Next Click as Destination Target", use_container_width=True):
+            if col_btn2.button("Set Next Click as Destination Target", use_container_width=True):
                 st.session_state['pick_stage'] = 'destination'
                 
             map_picker = folium.Map(location=[12.9716, 77.5946], zoom_start=11, tiles="CartoDB positron")
@@ -501,16 +501,16 @@ elif pages == "🗺️ Route Optimizer":
             dest_lat = st.number_input("Destination Latitude", value=st.session_state['route_dest'][0], format="%.6f", key="man_dest_lat")
             dest_lon = st.number_input("Destination Longitude", value=st.session_state['route_dest'][1], format="%.6f", key="man_dest_lon")
 
-    if st.button("🚀 Run Pathfinding Computations", use_container_width=True):
+    if st.button("Run Pathfinding Computations", use_container_width=True):
         with st.spinner("Executing dynamic traversals across updated cost networks..."):
             comparison_df, path_dijkstra, path_astar = compare_scenarios(
                 G_dynamic, orig_lat, orig_lon, dest_lat, dest_lon
             )
             
-            st.markdown("### 📋 Routing Engine Metric Deltas Summary")
+            st.markdown("### Routing Engine Metric Deltas Summary")
             st.dataframe(comparison_df, use_container_width=True)
             
-            st.markdown("### 🗺️ Dynamic Incident Command View")
+            st.markdown("### Dynamic Incident Command View")
             inc_lat = inc.get('latitude') if inc is not None else None
             inc_lon = inc.get('longitude') if inc is not None else None
             route_map = visualize_routes_on_map(
@@ -520,21 +520,21 @@ elif pages == "🗺️ Route Optimizer":
             )
             
             folium_static(route_map, width=1100, height=550)
-            st.caption("🔵 Solid Line Vector = Dijkstra Optimal Routing Path | 🟢 Dashed Line Vector = A* Fast Mapped Path | 🔴 Crimson Circle Area = Active Shockwave Impact Boundary")
+            st.caption("Solid Line Vector = Dijkstra Optimal Routing Path | Dashed Line Vector = A* Fast Mapped Path | Crimson Circle Area = Active Shockwave Impact Boundary")
 
 # ==========================================
 # PAGE 4: EDA INSIGHTS DASHBOARD
 # ==========================================
-elif pages == "📈 EDA Dashboard":
-    st.title("📈 Bengaluru Traffic Intelligence Dashboard")
+elif pages == "EDA Dashboard":
+    st.title("Bengaluru Traffic Intelligence Dashboard")
     st.markdown("##### Historical Analysis and Structural Bottleneck Discoveries extracted from BTP Log Registers")
     st.markdown("---")
     
     tab1, tab2, tab3, tab4 = st.tabs([
-        "🕒 Temporal Patterns & Seasonal Trends", 
-        "🛣️ Corridor & Station Capacities",
-        "🚏 Critical Junction Hotspots",
-        "⚖️ Priority Deployment & Status Metrics"
+        "Temporal Patterns & Seasonal Trends", 
+        "Corridor & Station Capacities",
+        "Critical Junction Hotspots",
+        "Priority Deployment & Status Metrics"
     ])
     
     with tab1:
@@ -542,72 +542,72 @@ elif pages == "📈 EDA Dashboard":
         st.markdown("> **Core Data Insight:** Vehicle breakdowns peak consistently between **5-7 AM** and **5-8 PM** on Outer Ring Road arterial routes, matching logistics carrier operation window switches before cross-city entry blocks lock down. Clear macro monthly fluctuations track seasonal monsoon peaks where clearance velocity drops by up to **42%**.")
         st.markdown("---")
         
-        st.markdown("### 🕒 Hourly Operations Pulse (By Cause)")
+        st.markdown("### Hourly Operations Pulse (By Cause)")
         img_path_1a = get_path("charts/visual_b_incident_hourly_patterns.png")
         if os.path.exists(img_path_1a):
             st.image(img_path_1a, use_column_width=True)
         else:
-            st.warning("⚠️ Hourly patterns chart asset is not found at expected path.")
+            st.warning("Hourly patterns chart asset is not found at expected path.")
         
-        st.markdown("### 📅 Macro Monthly Influx vs Response Velocity")
+        st.markdown("### Macro Monthly Influx vs Response Velocity")
         img_path_1b = get_path("charts/chart_8_monthly_macro_trend.png")
         if os.path.exists(img_path_1b):
             st.image(img_path_1b, use_column_width=True)
         else:
-            st.warning("⚠️ Monthly macro trend chart asset is not found at expected path.")
+            st.warning("Monthly macro trend chart asset is not found at expected path.")
         
     with tab2:
         st.subheader("Corridor Pressure & Breakdown Response Matrix")
         st.markdown("> **Core Data Insight:** Peenya and Outer Ring Road corridors accumulate the highest density of commercial vehicle accidents. Heavy vehicle breakdowns on three-lane corridors trigger non-linear queue expansions, resulting in average clearance delays exceeding **110 minutes**.")
         st.markdown("---")
         
-        st.markdown("### 🛣️ Top 10 High-Incident Traffic Corridors")
+        st.markdown("### Top 10 High-Incident Traffic Corridors")
         img_path_2a = get_path("charts/chart_13_top_corridors.png")
         if os.path.exists(img_path_2a):
             st.image(img_path_2a, use_column_width=True)
         else:
-            st.warning("⚠️ Top corridors chart asset is not found at expected path.")
+            st.warning("Top corridors chart asset is not found at expected path.")
         
-        st.markdown("### 📊 Breakdown Response: Corridor vs Vehicle Type")
+        st.markdown("### Breakdown Response: Corridor vs Vehicle Type")
         img_path_2b = get_path("charts/chart_22_breakdown_heatmap.png")
         if os.path.exists(img_path_2b):
             st.image(img_path_2b, use_column_width=True)
         else:
-            st.warning("⚠️ Breakdown Response Matrix heatmap asset is not found at expected path.")
+            st.warning("Breakdown Response Matrix heatmap asset is not found at expected path.")
         
     with tab3:
         st.subheader("Top Critical Intersections Ranked By Operational Impact")
         st.markdown("> **Core Data Insight:** Agara Junction and Central Silk Board track with an average historical clearing window exceeding **140 minutes** when heavy fleet carriers breakdown during peak morning windows. Higher closure requirements directly correlate with longer clearance timelines, highlighting the need for early diversion planning.")
         st.markdown("---")
         
-        st.markdown("### 🚏 Top 15 Junctions by Traffic Delay Stress")
+        st.markdown("### Top 15 Junctions by Traffic Delay Stress")
         img_path_3a = get_path("charts/visual_g_top_impacted_junctions.png")
         if os.path.exists(img_path_3a):
             st.image(img_path_3a, use_column_width=True)
         else:
-            st.warning("⚠️ Junction hotspot chart asset is not found at expected path.")
+            st.warning("Junction hotspot chart asset is not found at expected path.")
         
-        st.markdown("### 📋 Closure Rates vs Clearance Timelines")
+        st.markdown("### Closure Rates vs Clearance Timelines")
         img_path_3b = get_path("charts/chart_24_lookup_blueprint.png")
         if os.path.exists(img_path_3b):
             st.image(img_path_3b, use_column_width=True)
         else:
-            st.warning("⚠️ Closure vs Clearance blueprint asset is not found at expected path.")
+            st.warning("Closure vs Clearance blueprint asset is not found at expected path.")
         
     with tab4:
         st.subheader("Strategic Deployment Matrix & Lifecycle Blueprint")
         st.markdown("> **Core Data Insight:** Mapped 'High Priority' incident categorizations contain substantial internal duration variances, validating that BTP must prioritize incident type and vehicle class over basic priority labels. Donut status footprints show that active response tracking covers **94.7%** of logged events.")
         st.markdown("---")
         
-        st.markdown("### ⚖️ Strategic Deployment & Allocation Matrix")
+        st.markdown("### Strategic Deployment & Allocation Matrix")
         img_path_4a = get_path("charts/chart_25_priority_action_matrix.png")
         if os.path.exists(img_path_4a):
             st.image(img_path_4a, use_column_width=True)
         else:
-            st.warning("⚠️ Strategic Deployment Matrix chart asset is not found at expected path.")
+            st.warning("Strategic Deployment Matrix chart asset is not found at expected path.")
         
         st.markdown("---")
-        st.markdown("### 🏢 Lifecycle Status Footprint & Closure Profiles")
+        st.markdown("### Lifecycle Status Footprint & Closure Profiles")
         
         col1, col2 = st.columns(2)
         img_path_4b = get_path("charts/chart_4_status_donut.png")
@@ -618,24 +618,24 @@ elif pages == "📈 EDA Dashboard":
             if os.path.exists(img_path_4b):
                 st.image(img_path_4b, use_column_width=True)
             else:
-                st.warning("⚠️ Status donut asset not found.")
+                st.warning("Status donut asset not found.")
         with col2:
             st.markdown("##### Road Closure Requirements by Cause")
             if os.path.exists(img_path_4c):
                 st.image(img_path_4c, use_column_width=True)
             else:
-                st.warning("⚠️ Closure requirement asset not found.")
+                st.warning("Closure requirement asset not found.")
 
 # ==========================================
 # PAGE 5: LIVE MAP HEATMAP RENDERER
 # ==========================================
-elif pages == "🗺️ Incident Map":
-    st.title("🗺️ Bengaluru Incident Heatmap Tracker")
+elif pages == "Incident Map":
+    st.title("Bengaluru Incident Heatmap Tracker")
     st.markdown("##### Geospatial Volatility Visualizations and Real-Time Active Dispatch Mapping Interfaces")
     st.markdown("---")
     
     if historical_df.empty:
-        st.warning("⚠️ Mapped historical file parameters could not populate geographical heat layers.")
+        st.warning("Mapped historical file parameters could not populate geographical heat layers.")
     else:
         with st.spinner("Generating spatial grid coordinates and building interactive folium layers..."):
             m = folium.Map(location=[12.9716, 77.5946], zoom_start=11, tiles="CartoDB positron")
@@ -648,7 +648,7 @@ elif pages == "🗺️ Incident Map":
                 pin_color = 'red' if inc['impact'] == "High" else 'orange'
                 popup_text = f"""
                 <div style='font-family: Arial, sans-serif; width: 140px;'>
-                    <b>🚨 Active Dispatch</b><br>
+                    <b>Active Dispatch</b><br>
                     <b>Impact Tier:</b> {inc['impact']}<br>
                     <b>Manpower Allocated:</b> {inc['cops']} Cops
                 </div>
@@ -661,7 +661,7 @@ elif pages == "🗺️ Incident Map":
                     icon=folium.Icon(color=pin_color, icon='info-sign')
                 ).add_to(m)
                 
-                st.info(f"📍 Mapped live tracking coordinates: [Latitude: {inc['lat']} | Longitude: {inc['lon']}] relating directly to your active queue cluster.")
+                st.info(f"Mapped live tracking coordinates: [Latitude: {inc['lat']} | Longitude: {inc['lon']}] relating directly to your active queue cluster.")
             
             folium_static(m, width=1100, height=600)
             st.caption("Visual Map Grid Scale: High density clusters (Red areas) highlight historical multi-incident overlap hotspots.")
@@ -669,24 +669,24 @@ elif pages == "🗺️ Incident Map":
 # ==========================================
 # PAGE 6: STATION RESOURCE CONTROL PANEL (ADMIN)
 # ==========================================
-elif pages == "⚙️ Station Config":
-    st.title("⚙️ Station Resource Configuration Control Panel")
+elif pages == "Station Config":
+    st.title("Station Resource Configuration Control Panel")
     st.markdown("##### Manage and distribute static station resource limits dynamically across police jurisdictions")
     st.markdown("---")
     
-    st.warning("⚠️ **Administrative Authorization Override:** Modifying these resource pools will instantly mutate the mathematical capacity constraints inside the PuLP linear programming knapsack optimizer.")
+    st.warning("Administrative Authorization Override: Modifying these resource pools will instantly mutate the mathematical capacity constraints inside the PuLP linear programming knapsack optimizer.")
     
     pools = st.session_state['STATION_SUPPLY_POOLS']
     
     # Render interactive chart of current capacities
-    st.write("### 📊 Live Resource Capacity Visualizer")
+    st.write("### Live Resource Capacity Visualizer")
     chart_data = pd.DataFrame([
         {"Station": station.title(), "Cops Capacity": pool["cops"], "Barricades Capacity": pool["barricades"]}
         for station, pool in pools.items()
     ])
     st.bar_chart(chart_data.set_index("Station"), height=250, use_container_width=True)
     
-    st.write("### 🏢 Station Capacity Allocation Matrix")
+    st.write("### Station Capacity Allocation Matrix")
     
     cols = st.columns(2)
     updated_pools = {}
@@ -699,7 +699,7 @@ elif pages == "⚙️ Station Config":
     for i, station in enumerate(stations):
         col_idx = i % 2
         with cols[col_idx]:
-            st.markdown(f"#### 🚔 {station.title()} Junction Pool")
+            st.markdown(f"#### {station.title()} Junction Pool")
             c_input, b_input = st.columns(2)
             cops_val = c_input.number_input(
                 "Cops Limit", 
@@ -720,14 +720,14 @@ elif pages == "⚙️ Station Config":
             
     col_save, col_reset = st.columns([1, 1])
     
-    if col_save.button("💾 Apply Configuration & Save Matrix", use_container_width=True):
+    if col_save.button("Apply Configuration & Save Matrix", use_container_width=True):
         st.session_state['STATION_SUPPLY_POOLS'] = updated_pools
         recommendation_engine.STATION_SUPPLY_POOLS = updated_pools
-        st.success("✅ **Configuration applied!** Station resource pools updated successfully in live memory.")
+        st.success("Configuration applied! Station resource pools updated successfully in live memory.")
         st.toast("Active resources updated!")
         st.rerun()
         
-    if col_reset.button("🗑️ Reset to Standard BTP Defaults", use_container_width=True):
+    if col_reset.button("Reset to Standard BTP Defaults", use_container_width=True):
         defaults = {
             'peenya': {'cops': 15, 'barricades': 20},
             'hsr layout': {'cops': 20, 'barricades': 25},
@@ -740,5 +740,5 @@ elif pages == "⚙️ Station Config":
         }
         st.session_state['STATION_SUPPLY_POOLS'] = defaults
         recommendation_engine.STATION_SUPPLY_POOLS = defaults
-        st.success("♻️ Defaults restored. Save to apply.")
+        st.success("Defaults restored. Save to apply.")
         st.rerun()
