@@ -3,6 +3,15 @@
 EventGuard is an advanced predictive resource allocation system and dynamic digital twin designed to mitigate event-driven and unplanned traffic gridlocks in Bengaluru. The platform provides real-time predictive triage, resource optimization, and pathfinding by combining OpenStreetMap street network graphs, live incident logging pipelines, and empirical traffic priors from historical GPS probe data.
 
 ---
+Project Scope & Contributions
+This repository contains the standalone engineering architecture I built for this collaborative project. 
+
+* **My Contributions:** Architected the full REST API backend (**Flask**), engineered the custom **Leaflet.js Map-HUD** interface from scratch, and integrated the resource-allocation engine using **PuLP** to solve multi-objective dispatch prioritization.
+* **Team Scope:** The machine learning ensemble models and traffic route-optimization logic were developed by my teammate.
+
+---
+
+git branch -M main
 
 ## System Architecture & Key Components
 
